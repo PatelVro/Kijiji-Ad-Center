@@ -62,27 +62,73 @@
     }
 }
 
+// Function to fetch titles for a specific table
+async function fetchTitlesFromTable(table) {
+    try {
+        const response = await fetch(`/titles/${table}`);
+        const titles = await response.json();
+        const titlesWithUniqueIds = titles.map(title => ({
+            uniqueId: `${table}-${title.Product_id}`,
+            ...title
+        }));
+        return titlesWithUniqueIds;
+    } catch (error) {
+        console.error('Error fetching titles:', error);
+        throw error;
+    }
+}
 
+// Function to fetch and display titles for a specific table
+async function fetchAndDisplayTitles(tableName) {
+    try {
+        const titles = await fetchTitlesFromTable(tableName);
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear existing rows
+
+        titles.forEach(title => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <a href="/ad.html?uniqueId=${title.uniqueId}" target="_blank">${title.Title}</a>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error('Error fetching and displaying titles:', error);
+    }
+}
+
+// Function to fetch table names and populate the list
 async function fetchTableNames() {
     try {
         const response = await fetch('/tableNames'); // Replace with your server endpoint
         const tables = await response.json();
 
         const tableList = document.getElementById('Accounts-container');
+        tableList.innerHTML = ''; // Clear existing list
+
         tables.forEach(tableName => {
             const li = document.createElement('li');
+            li.classList.add('--set-active-profile-html');
             li.innerHTML = `
-            <li class="--set-active-profile-html">
-        <a href="/titles/${tableName}">
-          <span class="icon"><i class="mdi mdi-account-circle"></i></span>
-          <span class="menu-item-label">${tableName}</span>
-        </a>
-      </li>
-            
-                    
+                <a href="#" data-table-name="${tableName}">
+                    <span class="icon"><i class="mdi mdi-account-circle"></i></span>
+                    <span class="menu-item-label">${tableName}</span>
                 </a>
             `;
             tableList.appendChild(li);
+        });
+
+        // Add event listener for table name links using event delegation
+        tableList.addEventListener('click', async (event) => {
+            event.preventDefault(); // Prevent default link behavior
+            const target = event.target.closest('a[data-table-name]');
+            if (target) {
+                const tableName = target.dataset.tableName;
+                await fetchAndDisplayTitles(tableName);
+            }
         });
 
     } catch (error) {
@@ -90,11 +136,9 @@ async function fetchTableNames() {
     }
 }
 
-window.onload = function() {
-    fetchTableNames();
-    fetchAllTitles();
-};
-  </script>
+// Initialize by fetching table names
+fetchTableNames();  
+</script>
 
 </head>
 <body>

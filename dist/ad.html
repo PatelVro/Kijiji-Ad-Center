@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,10 +10,10 @@
   <!-- Tailwind is included -->
   <link rel="stylesheet" href="css/main.css?v=1652870200386">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png"/>
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png"/>
-  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#00b4b6"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#00b4b6" />
 
   <meta name="description" content="Admin One - free Tailwind dashboard">
 
@@ -35,139 +36,154 @@
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130795909-1"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-130795909-1');
-  </script>
-  <script>
-    async function fetchTitleDetails() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const uniqueId = urlParams.get('uniqueId');
-      try {
+async function fetchTitleDetails() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uniqueId = urlParams.get('uniqueId');
+    try {
         const response = await fetch(`/ad/${uniqueId}`);
         const details = await response.json();
         const tbody = document.getElementById('details-body');
 
+        // Clear existing table rows
+        tbody.innerHTML = '';
+
         for (const key in details) {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${key}</td>
-            <td>${details[key]}</td>
-          `;
-          tbody.appendChild(row);
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${key}</td>
+                <td><input type="text" value="${details[key]}" data-key="${key}"></td>
+            `;
+            tbody.appendChild(row);
         }
 
         // Append Save and Cancel buttons
         const saveRow = document.createElement('tr');
         saveRow.innerHTML = `
-          <td></td>
-          <td>
-            <button class="button blue" onclick="saveChanges('${uniqueId}')">Save</button>
-            <button class="button red" onclick="cancelChanges()">Cancel</button>
-          </td>
+            <td></td>
+            <td>
+                <button class="button blue" onclick="saveChanges('${uniqueId}')">Save</button>
+                <button class="button red" onclick="cancelChanges()">Cancel</button>
+            </td>
         `;
         tbody.appendChild(saveRow);
 
-      } catch (error) {
+    } catch (error) {
         console.error('Error fetching title details:', error);
-      }
     }
+}
 
-    async function saveChanges(uniqueId) {
-      try {
-        // Example of updating data (replace with your actual update logic)
-        const response = await fetch(`/update/${uniqueId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ /* Include updated data fields here */ })
+async function saveChanges(uniqueId) {
+    const tbody = document.getElementById('details-body');
+    const inputs = tbody.querySelectorAll('input');
+    const updatedDetails = {};
+
+    inputs.forEach(input => {
+        const key = input.getAttribute('data-key');
+        const value = input.value;
+        updatedDetails[key] = value;
+    });
+
+    try {
+        const response = await fetch(`/ad/${uniqueId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedDetails)
         });
-        const result = await response.json();
-        console.log('Update successful:', result);
-        // Optionally, redirect or display a success message
-      } catch (error) {
+
+        if (response.ok) {
+            console.log('Update successful');
+            alert('Details updated successfully!');
+            // Optionally, redirect or refresh the page after successful update
+        } else {
+            const errorText = await response.text();
+            console.error('Failed to update details:', response.status, response.statusText, errorText);
+            alert(`Failed to update details: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+    } catch (error) {
         console.error('Error saving changes:', error);
-      }
+        alert('Failed to update details. Please try again.');
     }
+}
 
-    function cancelChanges() {
-      // Implement cancellation logic as needed
-      console.log('Changes canceled');
-    }
-
+function cancelChanges() {
+    fetchTitleDetails(); // Re-fetch and display original details to cancel changes
+    console.log('Changes canceled');
+}
     window.onload = fetchTitleDetails;
   </script>
 
 </head>
+
 <body>
 
-<div id="app">
+  <div id="app">
 
-<nav id="navbar-main" class="navbar is-fixed-top">
-  <!-- Navbar content -->
-</nav>
+    <nav id="navbar-main" class="navbar is-fixed-top">
+      <!-- Navbar content -->
+    </nav>
 
-<aside class="aside is-placed-left is-expanded">
-  <!-- Sidebar content -->
-</aside>
+    <aside class="aside is-placed-left is-expanded">
+      <!-- Sidebar content -->
+    </aside>
 
-<section class="is-title-bar">
-  <!-- Title bar content -->
-</section>
+    <section class="is-title-bar">
+      <!-- Title bar content -->
+    </section>
 
-<section class="is-hero-bar">
-  <!-- Hero bar content -->
-</section>
+    <section class="is-hero-bar">
+      <!-- Hero bar content -->
+    </section>
 
-<section class="section main-section">
-  <div class="card has-table">
-    <header class="card-header">
-      <p class="card-header-title">
-        <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
-        Ads
-      </p>
-      <a href="#" class="card-header-icon">
-        <span class="icon"><i class="mdi mdi-reload"></i></span>
-      </a>
-    </header>
-    <div id="app">
-      <h1>Title Details</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody id="details-body">
-          <!-- Details will be appended here -->
-        </tbody>
-      </table>
+    <section class="section main-section">
+      <div class="card has-table">
+        <header class="card-header">
+          <p class="card-header-title">
+            <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+            Ads
+          </p>
+          <a href="#" class="card-header-icon">
+            <span class="icon"><i class="mdi mdi-reload"></i></span>
+          </a>
+        </header>
+        <div id="app">
+          <h1>Title Details</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody id="details-body">
+              <!-- Details will be appended here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <!-- Footer content -->
+    </footer>
+
+    <!-- Modals for demo purposes -->
+    <div id="sample-modal" class="modal">
+      <!-- Modal content -->
     </div>
+
   </div>
-</section>
 
-<footer class="footer">
-  <!-- Footer content -->
-</footer>
+  <!-- Scripts below are for demo only -->
+  <script type="text/javascript" src="js/main.min.js?v=1652870200386"></script>
 
-<!-- Modals for demo purposes -->
-<div id="sample-modal" class="modal">
-  <!-- Modal content -->
-</div>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+  <script type="text/javascript" src="js/chart.sample.min.js"></script>
 
-</div>
-
-<!-- Scripts below are for demo only -->
-<script type="text/javascript" src="js/main.min.js?v=1652870200386"></script>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-<script type="text/javascript" src="js/chart.sample.min.js"></script>
-
-<!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
-<link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+  <!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
+  <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
 
 </body>
+
 </html>

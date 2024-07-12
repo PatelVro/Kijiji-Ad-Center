@@ -113,7 +113,7 @@ app.get('/tableNames', async (req, res) => {
 app.get('/titles/:tableName', async (req, res) => {
     const tableName = req.params.tableName;
     try {
-        const titles = await getTitles(tableName);
+        const titles = await fetchTitlesFromTable(tableName);
         res.json(titles);
     } catch (error) {
         console.error(`Error fetching titles for table '${tableName}':`, error);
@@ -147,6 +147,32 @@ app.get('/ad/:uniqueId', (req, res) => {
         res.json(results[0]); // Assuming there's only one result
     });
 });
+
+app.put('/ad/:uniqueId', (req, res) => {
+    const uniqueId = req.params.uniqueId;
+    const [table, id] = uniqueId.split('-');
+    const updatedData = req.body; // Assuming the updated data is sent in the request body
+
+    // Construct SQL query to update data in the specified table
+    const setClause = Object.keys(updatedData)
+        .map(field => `\`${field}\` = ?`)
+        .join(', ');
+
+    const values = Object.values(updatedData);
+    values.push(id);
+
+    const sql = `UPDATE \`${table}\` SET ${setClause} WHERE \`Product_id\` = ?`;
+
+    // Execute the query to update data
+    db.query(sql, values, (err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.status(200).send('Data updated successfully');
+    });
+});
+
+
 
 // Start the server
 app.listen(port, () => {
