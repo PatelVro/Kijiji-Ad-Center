@@ -148,7 +148,62 @@ app.get('/ad/:uniqueId', (req, res) => {
     });
 });
 
-app.put('/ad/:uniqueId', (req, res) => {
+
+const validateData = (req, res, next) => {
+    const fields = {
+        'Condition': 'string',
+        'Description': 'string',
+        'Images_FolderName': 'string',
+        'laptop_Screen_Size': 'string',
+        'Phone': 'bigint', // Conceptual reference for phone number
+        'PhoneBrand': 'string',
+        'PhoneBrandCarrier': 'string',
+        'Price': 'number',
+        'Product_id': 'number',
+        'Size': 'string',
+        'Tablet_Brand': 'string',
+        'Tags': 'string',
+        'Title': 'string',
+        'Type': 'string'
+    };
+
+    const errors = [];
+
+    for (const [key, type] of Object.entries(fields)) {
+        if (req.body.hasOwnProperty(key)) {
+            let value = req.body[key];
+
+            // Convert string to number if the type is 'bigint' or 'number'
+            if (type === 'bigint' || type === 'number') {
+                value = Number(value);
+                req.body[key] = value; // Update the req.body with the converted value
+            }
+
+            if (type === 'string' && typeof value !== 'string') {
+                errors.push(`${key} should be a string`);
+            }
+
+            if (type === 'bigint' && (typeof value !== 'number' || value.toString().length < 10)) {
+                errors.push(`${key} should be a number with at least 10 digits`);
+            }
+
+            // Check for numeric characters in brand and carrier fields
+            if (type === 'string' && (key === 'PhoneBrand' || key === 'PhoneBrandCarrier' || key === 'Tablet_Brand')) {
+                if (/\d/.test(value)) {
+                    errors.push(`${key} should not contain numbers`);
+                }
+            }
+        }
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({ errors });
+    }
+
+    next();
+};
+
+app.put('/ad/:uniqueId', validateData, (req, res) => {
     const uniqueId = req.params.uniqueId;
     const [table, id] = uniqueId.split('-');
     const updatedData = req.body; // Assuming the updated data is sent in the request body
@@ -167,6 +222,7 @@ app.put('/ad/:uniqueId', (req, res) => {
     db.query(sql, values, (err, results) => {
         if (err) {
             return res.status(500).send(err);
+           
         }
         res.status(200).send('Data updated successfully');
     });
