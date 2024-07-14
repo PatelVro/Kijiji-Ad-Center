@@ -44,23 +44,14 @@ async function fetchTitleDetails() {
         const details = await response.json();
         const tbody = document.getElementById('details-body');
 
-        // Set the product title
-        const titleElement = document.getElementById('product-title');
-        titleElement.textContent = details.Title || 'Product Title Here'; // Set title or default text
-
         // Clear existing table rows
         tbody.innerHTML = '';
 
         for (const key in details) {
-            const isProductId = key === 'Product_id';
-            const inputElement = isProductId 
-                ? `<input type="text" value="${details[key]}" data-key="${key}" disabled>` 
-                : `<input type="text" value="${details[key]}" data-key="${key}">`;
-            
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${key}</td>
-                <td>${inputElement}</td>
+                <td><input type="text" value="${details[key]}" data-key="${key}"></td>
             `;
             tbody.appendChild(row);
         }
@@ -71,8 +62,7 @@ async function fetchTitleDetails() {
             <td></td>
             <td>
                 <button class="button blue" onclick="saveChanges('${uniqueId}')">Save</button>
-                <button class="button red" onclick="cancelChanges()">Return Back to Home Page</button>
-                
+                <button class="button red" onclick="cancelChanges()">Cancel</button>
             </td>
         `;
         tbody.appendChild(saveRow);
@@ -102,14 +92,14 @@ async function saveChanges(uniqueId) {
             body: JSON.stringify(updatedDetails)
         });
 
-        const responseText = await response.text(); // Read the response text
-
         if (response.ok) {
             console.log('Update successful');
-            alert(responseText); // Alert success message
+            alert('Details updated successfully!');
+            // Optionally, redirect or refresh the page after successful update
         } else {
-            console.error('Failed to update details:', response.status, response.statusText, responseText);
-            alert(`${responseText}`); // Alert error message
+            const errorText = await response.text();
+            console.error('Failed to update details:', response.status, response.statusText, errorText);
+            alert(`Failed to update details: ${response.status} ${response.statusText} - ${errorText}`);
         }
     } catch (error) {
         console.error('Error saving changes:', error);
@@ -118,10 +108,9 @@ async function saveChanges(uniqueId) {
 }
 
 function cancelChanges() {
-    window.location.href = '/'; // Redirects to the home page
-    console.log('Redirecting to home page');
+    fetchTitleDetails(); // Re-fetch and display original details to cancel changes
+    console.log('Changes canceled');
 }
-
     window.onload = fetchTitleDetails;
   </script>
 
@@ -140,8 +129,8 @@ function cancelChanges() {
     </aside>
 
     <section class="is-title-bar">
-      <h1 id="product-title">Product Title Here</h1>
-  </section>
+      <!-- Title bar content -->
+    </section>
 
     <section class="is-hero-bar">
       <!-- Hero bar content -->
