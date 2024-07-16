@@ -14,7 +14,8 @@ app.use(express.static(path.join(__dirname, "dist")));
 
 // MySQL database connection
 const db = mysql.createConnection({
-  host: "localhost", // Replace with your MySQL host
+  host: "127.0.0.1", // Replace with your MySQL host
+  port: "3306",
   user: "tryout", // Replace with your MySQL username
   password: "Superman1431$", // Replace with your MySQL password
   database: "canadian_outlet_adcenter", // Replace with your database name
@@ -117,9 +118,9 @@ app.get("/titles/:tableName", async (req, res) => {
     const titles = await fetchTitlesFromTable(tableName);
     res.json(titles);
   } catch (error) {
-    console.error(`Error fetching titles for table '${tableName}':`, error);
+    console.error(`Error fetching titles for table '\`${table}\`':`, error);
     res.status(500).json({
-      error: `Internal server error fetching titles for table '${tableName}'`,
+      error: `Internal server error fetching titles for table '\`${table}\`'`,
     });
   }
 });
@@ -127,7 +128,7 @@ app.get("/titles/:tableName", async (req, res) => {
 // Function to fetch titles for a specific table from MySQL
 function getTitles(tableName) {
   return new Promise((resolve, reject) => {
-    const query = `SELECT Title FROM ${tableName}`; // Adjust SQL query as per your table structure
+    const query = `SELECT Title FROM \`${table}\``; // Adjust SQL query as per your table structure
     db.query(query, (error, results) => {
       if (error) {
         reject(error);
