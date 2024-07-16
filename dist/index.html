@@ -51,7 +51,7 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>
-                    <a href="/ad.html?uniqueId=${title.uniqueId}" target="_blank">${title.Title}</a>
+                    <a href="/ad.html?uniqueId=${title.uniqueId}">${title.Title}</a>
                 </td>
             `;
             tbody.appendChild(row);
@@ -89,7 +89,7 @@ async function fetchAndDisplayTitles(tableName) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>
-                    <a href="/ad.html?uniqueId=${title.uniqueId}" target="_blank">${title.Title}</a>
+                    <a href="/ad.html?uniqueId=${title.uniqueId}" >${title.Title}</a>
                 </td>
             `;
             tbody.appendChild(row);

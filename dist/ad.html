@@ -36,51 +36,98 @@
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130795909-1"></script>
   <script>
-async function fetchTitleDetails() {
+ 
+ async function fetchTitleDetails() {
     const urlParams = new URLSearchParams(window.location.search);
     const uniqueId = urlParams.get('uniqueId');
+    
     try {
         const response = await fetch(`/ad/${uniqueId}`);
         const details = await response.json();
         const tbody = document.getElementById('details-body');
 
-        // Set the product title
-        const titleElement = document.getElementById('product-title');
-        titleElement.textContent = details.Title || 'Product Title Here'; // Set title or default text
-
         // Clear existing table rows
         tbody.innerHTML = '';
 
+        const fieldSizes = {
+            'Condition': { width: 20, height: 2 },
+            'Description': { width: 100, height: 49 }, // Updated for textarea
+            'Images_FolderName': { width: 30, height: 2 },
+            'laptop Screen Size': { width: 20, height: 2 },
+            'Phone': { width: 15, height: 2 },
+            'PhoneBrand': { width: 25, height: 2 },
+            'PhoneBrandCarrier': { width: 25, height: 2 },
+            'Price': { width: 10, height: 2 },
+            'Product_id': { width: 10, height: 2 },
+            'Size': { width: 15, height: 2 },
+            'Tablet Brand': { width: 25, height: 2 },
+            'Tags': { width: 20, height: 2 },
+            'Title': { width: 100, height: 2 },
+            'Type': { width: 20, height: 2 },
+            'Category': { width: 100, height: 2 }
+        };
+
         for (const key in details) {
+            const { width, height } = fieldSizes[key] || { width: 10, height: 2 };
             const isProductId = key === 'Product_id';
-            const inputElement = isProductId 
-                ? `<input type="text" value="${details[key]}" data-key="${key}" disabled>` 
-                : `<input type="text" value="${details[key]}" data-key="${key}">`;
-            
+
+            let inputElement;
+            if (key === 'Description') {
+                // Create a textarea for the Description field
+                inputElement = document.createElement('textarea');
+                inputElement.setAttribute("data-key", key);
+                inputElement.style.width = `${width}ch`; // Set width
+                inputElement.style.height = `${height}em`; // Set height
+                inputElement.value = details[key];
+                inputElement.style.resize = 'none'; // Disable resizing
+            } else {
+                // Create input element for other fields
+                inputElement = document.createElement('input');
+                inputElement.type = "text";
+                inputElement.value = details[key];
+                inputElement.setAttribute("data-key", key);
+                inputElement.size = width; // Set width
+                inputElement.style.height = `${height}em`; // Set height
+            }
+
+            if (isProductId) {
+                inputElement.disabled = true;
+            }
+
+            // Create table row
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${key}</td>
-                <td>${inputElement}</td>
-            `;
+            const cellKey = document.createElement('td');
+            const cellInput = document.createElement('td');
+            
+            cellKey.textContent = key;
+            cellInput.appendChild(inputElement);
+
+            row.appendChild(cellKey);
+            row.appendChild(cellInput);
             tbody.appendChild(row);
         }
 
         // Append Save and Cancel buttons
         const saveRow = document.createElement('tr');
-        saveRow.innerHTML = `
-            <td></td>
-            <td>
-                <button class="button blue" onclick="saveChanges('${uniqueId}')">Save</button>
-                <button class="button red" onclick="cancelChanges()">Return Back to Home Page</button>
-                
-            </td>
+        const cellEmpty = document.createElement('td');
+        const cellButtons = document.createElement('td');
+
+        cellButtons.innerHTML = `
+            <button class="button blue" onclick="saveChanges('${uniqueId}')">Save</button>
+            <button class="button red" onclick="cancelChanges()">Return Back to Home Page</button>
         `;
+
+        saveRow.appendChild(cellEmpty);
+        saveRow.appendChild(cellButtons);
         tbody.appendChild(saveRow);
 
     } catch (error) {
         console.error('Error fetching title details:', error);
     }
 }
+
+
+
 
 async function saveChanges(uniqueId) {
     const tbody = document.getElementById('details-body');
@@ -123,7 +170,44 @@ function cancelChanges() {
 }
 
     window.onload = fetchTitleDetails;
-  </script>
+    async function fetchTableNames() {
+    try {
+        const response = await fetch('/tableNames'); // Replace with your server endpoint
+        const tables = await response.json();
+
+        const tableList = document.getElementById('Accounts-container');
+        tableList.innerHTML = ''; // Clear existing list
+
+        tables.forEach(tableName => {
+            const li = document.createElement('li');
+            li.classList.add('--set-active-profile-html');
+            li.innerHTML = `
+                <a href="#" data-table-name="${tableName}">
+                    <span class="icon"><i class="mdi mdi-account-circle"></i></span>
+                    <span class="menu-item-label">${tableName}</span>
+                </a>
+            `;
+            tableList.appendChild(li);
+        });
+
+        // Add event listener for table name links using event delegation
+        tableList.addEventListener('click', async (event) => {
+            event.preventDefault(); // Prevent default link behavior
+            const target = event.target.closest('a[data-table-name]');
+            if (target) {
+                const tableName = target.dataset.tableName;
+                await fetchAndDisplayTitles(tableName);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching table names:', error);
+    }
+}
+
+// Initialize by fetching table names
+fetchTableNames(); 
+</script>
 
 </head>
 
@@ -135,12 +219,32 @@ function cancelChanges() {
       <!-- Navbar content -->
     </nav>
 
-    <aside class="aside is-placed-left is-expanded">
-      <!-- Sidebar content -->
-    </aside>
+    
+      <aside class="aside is-placed-left is-expanded" style="width: 200px; flex-shrink: 0;">
+      
+        <div class="aside-tools">
+          <div class="text-xl">
+            <b class="font-black">Canadian Outlet</b>
+          </div>
+        </div>
+        <div class="menu is-menu-main">
+          <p class="menu-label">General</p>
+          <ul class="menu-list">
+            <li class="active">
+              <a href="index.html">
+                <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
+                <span class="menu-item-label">Dashboard</span>
+              </a>
+            </li>
+          </ul>
+          <p class="menu-label">Accounts</p>
+          <ul class="menu-list" id="Accounts-container">
+            
+          </ul>
+   </aside>
 
     <section class="is-title-bar">
-      <h1 id="product-title">Product Title Here</h1>
+      <h1 id="product-title"></h1>
   </section>
 
     <section class="is-hero-bar">
@@ -159,7 +263,7 @@ function cancelChanges() {
           </a>
         </header>
         <div id="app">
-          <h1>Title Details</h1>
+          
           <table>
             <thead>
               <tr>
