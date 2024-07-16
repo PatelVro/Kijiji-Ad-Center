@@ -227,7 +227,7 @@ app.put("/ad/:uniqueId", validateData, (req, res) => {
   const values = Object.values(updatedData);
   values.push(id);
 
-  const sql = `UPDATE \`${table}\` SET ${setClause} WHERE \`Product_id\` = ?`;
+  const sql = `UPDATE ${table} SET ${setClause} WHERE \`Product_id\` = ?`;
 
   // Execute the query to update data
   db.query(sql, values, (err, results) => {
