@@ -88,11 +88,11 @@ async function getTableNames() {
 // Function to fetch titles from a specific table
 async function fetchTitlesFromTable(table) {
   return new Promise((resolve, reject) => {
-    db.query(`SELECT Product_id, Title FROM ${table}`, (err, results) => {
+    db.query(`SELECT Product_id, Title FROM \`${table}\``, (err, results) => {
       if (err) return reject(err);
       // Append table name to Product_id to create a unique ID
       const titlesWithUniqueIds = results.map((result) => ({
-        uniqueId: `${table}-${result.Product_id}`,
+        uniqueId: `\`${table}\`-${result.Product_id}`,
         ...result,
       }));
       resolve(titlesWithUniqueIds);
