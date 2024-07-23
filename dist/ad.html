@@ -80,6 +80,7 @@
                 inputElement.style.height = `${height}em`; // Set height
                 inputElement.value = details[key];
                 inputElement.style.resize = 'none'; // Disable resizing
+                // inputElement.readOnly = true;
             } else {
                 // Create input element for other fields
                 inputElement = document.createElement('input');
@@ -179,6 +180,9 @@ function cancelChanges() {
         tableList.innerHTML = ''; // Clear existing list
 
         tables.forEach(tableName => {
+          if (tableName === 'users') {
+        return; // Skip the iteration if the table name is 'users'
+    }
             const li = document.createElement('li');
             li.classList.add('--set-active-profile-html');
             li.innerHTML = `

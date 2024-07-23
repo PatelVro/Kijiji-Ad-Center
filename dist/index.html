@@ -41,6 +41,7 @@
     gtag('config', 'UA-130795909-1');
   </script>
   <script>
+    let allFetchedTitles = [];
     async function fetchAllTitles() {
     try {
         const response = await fetch('/allTitles');
@@ -56,6 +57,8 @@
             `;
             tbody.appendChild(row);
         });
+
+        allFetchedTitles = titles; // Store all titles    
 
     } catch (error) {
         console.error('Error fetching titles:', error);
@@ -94,7 +97,7 @@ async function fetchAndDisplayTitles(tableName) {
             `;
             tbody.appendChild(row);
         });
-
+        allFetchedTitles = titles; // Store all titles      
     } catch (error) {
         console.error('Error fetching and displaying titles:', error);
     }
@@ -110,6 +113,9 @@ async function fetchTableNames() {
         tableList.innerHTML = ''; // Clear existing list
 
         tables.forEach(tableName => {
+          if (tableName === 'users') {
+        return; // Skip the iteration if the table name is 'users'
+    }
             const li = document.createElement('li');
             li.classList.add('--set-active-profile-html');
             li.innerHTML = `
@@ -136,6 +142,29 @@ async function fetchTableNames() {
     }
 }
 
+
+
+function filterTitles() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const filteredTitles = allFetchedTitles.filter(title => title.Title.toLowerCase().includes(query));
+  displayTitles(filteredTitles);
+}
+
+function displayTitles(titles) {
+  const tbody = document.querySelector('tbody');
+  tbody.innerHTML = ''; // Clear existing rows
+
+  titles.forEach(title => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>
+        <a href="/ad.html?uniqueId=${title.uniqueId}">${title.Title}</a>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
 // Initialize by fetching table names
 fetchTableNames();  
 </script>
@@ -151,7 +180,7 @@ fetchTableNames();
       <span class="icon"><i class="mdi mdi-forwardburger mdi-24px"></i></span>
     </a>
     <div class="navbar-item">
-      <div class="control"><input placeholder="Search everywhere..." class="input"></div>
+      <div class="control"><input placeholder="Search everywhere..." class="input" id="search-input" oninput="filterTitles()"></div>
     </div>
   </div>
   <div class="navbar-brand is-right">
@@ -197,8 +226,8 @@ fetchTableNames();
           <div class="is-user-name"><span>Mark Dosani</span></div>
           <span class="icon"><i class="mdi mdi-chevron-down"></i></span>
         </a>
-        <!-- <div class="navbar-dropdown">
-          <a href="profile.html" class="navbar-item">
+        <div class="navbar-dropdown">
+          <!-- <a href="profile.html" class="navbar-item">
             <span class="icon"><i class="mdi mdi-account"></i></span>
             <span>My Profile</span>
           </a>
@@ -210,12 +239,12 @@ fetchTableNames();
             <span class="icon"><i class="mdi mdi-email"></i></span>
             <span>Messages</span>
           </a>
-          <hr class="navbar-divider">
+          <hr class="navbar-divider"> -->
           <a class="navbar-item">
             <span class="icon"><i class="mdi mdi-logout"></i></span>
-            <span>Log Out</span>
+            <span id="logoutButton">Log Out</span>
           </a>
-        </div> -->
+        </div>
       </div>
       <!-- <a href="https://justboil.me/tailwind-admin-templates/free-dashboard/" class="navbar-item has-divider desktop-icon-only">
         <span class="icon"><i class="mdi mdi-help-circle-outline"></i></span>
@@ -283,7 +312,7 @@ fetchTableNames();
           <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
           Ads
         </p>
-        <a href="/" class="card-header-icon">
+        <a href="index.html" class="card-header-icon">
           <span class="icon"><i class="mdi mdi-reload"></i></span>
         </a>
       </header>
@@ -373,6 +402,12 @@ fetchTableNames();
 
 
 <script>
+    document.getElementById('logoutButton').addEventListener('click', function () {
+    
+        window.location.href = 'login.html';
+      
+  });
+
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};

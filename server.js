@@ -10,6 +10,13 @@ const port = 3001;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve index.html on root request
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "login.html"));
+});
+
+
 app.use(express.static(path.join(__dirname, "dist")));
 
 // MySQL database connection
@@ -30,10 +37,30 @@ db.connect((err) => {
   console.log("MySQL connected...");
 });
 
-// Serve index.html on root request
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+app.post('/login', (req, res) => {
+  const { login, password } = req.body;
+
+  const query = 'SELECT * FROM users WHERE username = ? AND password = ?';
+  db.query(query, [login, password], (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Database query error' });
+    } else if (results.length > 0) {
+      res.status(200).json({ success: true, message: 'Login successful' });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+  });
 });
+
+// Log out route
+// app.post('/logout', (req, res) => {
+//   req.session.destroy((err) => {
+//     if (err) {
+//       return res.status(500).json({ success: false, message: 'Failed to log out' });
+//     }
+//     res.status(200).json({ success: true, message: 'Log out successful' });
+//   });
+// });
 
 // Example route to fetch all products
 app.get("/api/products", (req, res) => {
