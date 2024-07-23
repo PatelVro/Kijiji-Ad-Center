@@ -111,7 +111,7 @@ async function fetchTableNames() {
 
         const tableList = document.getElementById('Accounts-container');
         tableList.innerHTML = ''; // Clear existing list
-
+   
         tables.forEach(tableName => {
           if (tableName === 'users') {
         return; // Skip the iteration if the table name is 'users'
@@ -167,6 +167,7 @@ function displayTitles(titles) {
 
 // Initialize by fetching table names
 fetchTableNames();  
+fetchAllTitles();
 </script>
 
 </head>

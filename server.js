@@ -106,11 +106,14 @@ async function getTableNames() {
   return new Promise((resolve, reject) => {
     db.query("SHOW TABLES", (err, tables) => {
       if (err) return reject(err);
-      const tableNames = tables.map((row) => Object.values(row)[0]);
+      const tableNames = tables
+        .map((row) => Object.values(row)[0])
+        .filter((name) => name !== 'users'); // Filter out the 'users' table
       resolve(tableNames);
     });
   });
 }
+
 
 // Function to fetch titles from a specific table
 async function fetchTitlesFromTable(table) {
