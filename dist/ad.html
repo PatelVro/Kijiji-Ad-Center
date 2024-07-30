@@ -80,7 +80,7 @@
                 inputElement.style.height = `${height}em`; // Set height
                 inputElement.value = details[key];
                 inputElement.style.resize = 'none'; // Disable resizing
-                // inputElement.readOnly = true;
+                inputElement.readOnly = true;
             } else {
                 // Create input element for other fields
                 inputElement = document.createElement('input');
@@ -89,6 +89,7 @@
                 inputElement.setAttribute("data-key", key);
                 inputElement.size = width; // Set width
                 inputElement.style.height = `${height}em`; // Set height
+                inputElement.readOnly = true;
             }
 
             if (isProductId) {
@@ -166,7 +167,7 @@ async function saveChanges(uniqueId) {
 }
 
 function cancelChanges() {
-    window.location.href = '/'; // Redirects to the home page
+    window.location.href = 'index.html'; // Redirects to the home page
     console.log('Redirecting to home page');
 }
 
