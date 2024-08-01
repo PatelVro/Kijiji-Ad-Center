@@ -31,6 +31,11 @@
   <meta property="twitter:image:src" content="https://justboil.me/images/one-tailwind/repository-preview-hi-res.png">
   <meta property="twitter:image:width" content="1920">
   <meta property="twitter:image:height" content="960">
+  <style>
+  .active {
+    background-color: #d0d0d0; /* Change the background color when active */
+  }
+</style>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130795909-1"></script>
@@ -127,13 +132,20 @@ async function fetchTableNames() {
             tableList.appendChild(li);
         });
 
-        // Add event listener for table name links using event delegation
         tableList.addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent default link behavior
             const target = event.target.closest('a[data-table-name]');
             if (target) {
                 const tableName = target.dataset.tableName;
                 await fetchAndDisplayTitles(tableName);
+
+                // Remove active class from all items
+                document.querySelectorAll('#Accounts-container li').forEach(li => {
+                    li.classList.remove('active');
+                });
+
+                // Add active class to the clicked item
+                target.closest('li').classList.add('active');
             }
         });
 
@@ -313,9 +325,11 @@ fetchAllTitles();
           <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
           Ads
         </p>
+        <button class="button blue" onclick="displayForm()">Create New Ad</button>
         <a href="index.html" class="card-header-icon">
           <span class="icon"><i class="mdi mdi-reload"></i></span>
         </a>
+
       </header>
       <div class="card-content">
         <table>
