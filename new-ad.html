@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - Admin One Tailwind CSS Admin Dashboard</title>
+
+  <!-- Tailwind is included -->
+  <link rel="stylesheet" href="css/main.css?v=1652870200386">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#00b4b6" />
+
+  <meta name="description" content="Admin One - free Tailwind dashboard">
+
+  <meta property="og:url" content="https://justboil.github.io/admin-one-tailwind/">
+  <meta property="og:site_name" content="JustBoil.me">
+  <meta property="og:title" content="Admin One HTML">
+  <meta property="og:description" content="Admin One - free Tailwind dashboard">
+  <meta property="og:image" content="https://justboil.me/images/one-tailwind/repository-preview-hi-res.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1920">
+  <meta property="og:image:height" content="960">
+
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Admin One HTML">
+  <meta property="twitter:description" content="Admin One - free Tailwind dashboard">
+  <meta property="twitter:image:src" content="https://justboil.me/images/one-tailwind/repository-preview-hi-res.png">
+  <meta property="twitter:image:width" content="1920">
+  <meta property="twitter:image:height" content="960">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130795909-1"></script>
+  <script>
+ 
+ async function createNewAd() {
+    const tbody = document.getElementById('details-body');
+
+    // Clear existing table rows
+    tbody.innerHTML = '';
+
+    const fieldSizes = {
+        'Account': {width: 100, height: 2},
+        'Product_id': { width: 20, height: 2 },
+        'Condition': { width: 20, height: 2 },
+        'Description': { width: 100, height: 49 },
+        'Images_FolderName': { width: 30, height: 2 },
+        'laptop Screen Size': { width: 20, height: 2 },
+        'Phone': { width: 15, height: 2 },
+        'PhoneBrand': { width: 25, height: 2 },
+        'PhoneBrandCarrier': { width: 25, height: 2 },
+        'Price': { width: 10, height: 2 },
+        'Product_id': { width: 10, height: 2 },
+        'Size': { width: 15, height: 2 },
+        'Tablet Brand': { width: 25, height: 2 },
+        'Tags': { width: 20, height: 2 },
+        'Title': { width: 100, height: 2 },
+        'Type': { width: 20, height: 2 },
+        'Category': { width: 100, height: 2 }
+    };
+
+    for (const key in fieldSizes) {
+        const { width, height } = fieldSizes[key];
+
+        let inputElement;
+        if (key === 'Description') {
+            inputElement = document.createElement('textarea');
+            inputElement.setAttribute("data-key", key);
+            inputElement.style.width = `${width}ch`;
+            inputElement.style.height = `${height}em`;
+            inputElement.style.resize = 'none';
+        } else {
+            inputElement = document.createElement('input');
+            inputElement.type = "text";
+            inputElement.setAttribute("data-key", key);
+            inputElement.size = width;
+            inputElement.style.height = `${height}em`;
+        }
+
+        // Create table row
+        const row = document.createElement('tr');
+        const cellKey = document.createElement('td');
+        const cellInput = document.createElement('td');
+
+        cellKey.textContent = key;
+        cellInput.appendChild(inputElement);
+
+        row.appendChild(cellKey);
+        row.appendChild(cellInput);
+        tbody.appendChild(row);
+    }
+
+    // Append Save and Cancel buttons
+    const saveRow = document.createElement('tr');
+    const cellEmpty = document.createElement('td');
+    const cellButtons = document.createElement('td');
+
+    cellButtons.innerHTML = `
+        <button class="button blue" onclick="saveNewAd()">Save</button>
+        <button class="button red" onclick="cancelChanges()">Return Back to Home Page</button>
+    `;
+
+    saveRow.appendChild(cellEmpty);
+    saveRow.appendChild(cellButtons);
+    tbody.appendChild(saveRow);
+}
+
+
+
+
+async function saveNewAd() {
+    const tbody = document.getElementById('details-body');
+    const inputs = tbody.querySelectorAll('input,textarea');
+    const newRecord = {};
+    let accountEmail = '';
+
+    inputs.forEach(input => {
+        const key = input.getAttribute('data-key');
+        if (key === 'Account') {
+            accountEmail = input.value; // Get the value of the Account field
+        } else if (key !== 'Account') { // Exclude the 'Account' field from the record data
+            const value = input.value;
+            newRecord[key] = value;
+        }
+    });
+
+    // Construct the unique ID using accountEmail and Product_id
+    const productId = newRecord['Product_id'];
+    const uniqueId = `${accountEmail}-${productId}`;
+
+    try {
+        const response = await fetch('/ad/new', { // Use POST to create a new record
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                uniqueId: uniqueId,
+                Account: accountEmail,
+                ...newRecord
+            })
+        });
+
+        const responseText = await response.text();
+
+        if (response.ok) {
+            console.log('Record creation successful');
+            alert(responseText);
+        } else {
+            console.error('Failed to create record:', response.status, response.statusText, responseText);
+            alert(`Failed to create record: ${responseText}`);
+        }
+    } catch (error) {
+        console.error('Error saving new record:', error);
+        alert('Failed to create record. Please try again.');
+    }
+}
+
+
+
+function cancelChanges() {
+    window.location.href = 'index.html'; // Redirects to the home page
+    console.log('Redirecting to home page');
+}
+
+    // window.onload = fetchTitleDetails;
+    async function fetchTableNames() {
+    try {
+        const response = await fetch('/tableNames'); // Replace with your server endpoint
+        const tables = await response.json();
+
+        const tableList = document.getElementById('Accounts-container');
+        tableList.innerHTML = ''; // Clear existing list
+
+        tables.forEach(tableName => {
+          if (tableName === 'users') {
+        return; // Skip the iteration if the table name is 'users'
+    }
+            const li = document.createElement('li');
+            li.classList.add('--set-active-profile-html');
+            li.innerHTML = `
+                <a href="#" data-table-name="${tableName}">
+                    <span class="icon"><i class="mdi mdi-account-circle"></i></span>
+                    <span class="menu-item-label">${tableName}</span>
+                </a>
+            `;
+            tableList.appendChild(li);
+        });
+
+        // Add event listener for table name links using event delegation
+        tableList.addEventListener('click', async (event) => {
+            event.preventDefault(); // Prevent default link behavior
+            const target = event.target.closest('a[data-table-name]');
+            if (target) {
+                const tableName = target.dataset.tableName;
+                await fetchAndDisplayTitles(tableName);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching table names:', error);
+    }
+}
+
+// Initialize by fetching table names
+document.addEventListener('DOMContentLoaded', () => {
+  createNewAd(); // This will now run after the DOM is fully loaded
+});
+</script>
+
+</head>
+
+<body>
+
+  <div id="app">
+
+    <nav id="navbar-main" class="navbar is-fixed-top">
+      <!-- Navbar content -->
+    </nav>
+
+    
+      <aside class="aside is-placed-left is-expanded" style="width: 200px; flex-shrink: 0;">
+      
+        <div class="aside-tools">
+          <div class="text-xl">
+            <b class="font-black">Canadian Outlet</b>
+          </div>
+        </div>
+        <div class="menu is-menu-main">
+          <p class="menu-label">General</p>
+          <ul class="menu-list">
+            <li class="active">
+              <a href="index.html">
+                <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
+                <span class="menu-item-label">Dashboard</span>
+              </a>
+            </li>
+          </ul>
+          <p class="menu-label">Accounts</p>
+          <ul class="menu-list" id="Accounts-container">
+            
+          </ul>
+   </aside>
+
+    <section class="is-title-bar">
+      <h1 id="product-title"></h1>
+  </section>
+
+    <section class="is-hero-bar">
+      <!-- Hero bar content -->
+    </section>
+
+    <section class="section main-section">
+      <div class="card has-table">
+        <header class="card-header">
+          <p class="card-header-title">
+            <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+            Ads
+          </p>
+          <a href="#" class="card-header-icon">
+            <span class="icon"><i class="mdi mdi-reload"></i></span>
+          </a>
+        </header>
+        <div id="app">
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody id="details-body">
+              <!-- Details will be appended here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <!-- Footer content -->
+    </footer>
+
+    <!-- Modals for demo purposes -->
+    <div id="sample-modal" class="modal">
+      <!-- Modal content -->
+    </div>
+
+  </div>
+
+  <!-- Scripts below are for demo only -->
+  <script type="text/javascript" src="js/main.min.js?v=1652870200386"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+  <script type="text/javascript" src="js/chart.sample.min.js"></script>
+
+  <!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
+  <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+
+</body>
+
+</html>
