@@ -170,6 +170,7 @@ function getTitles(tableName) {
   });
 }
 
+
 app.get("/ad/:uniqueId", (req, res) => {
   const uniqueId = req.params.uniqueId;
   const [table, id] = uniqueId.split("-");
@@ -243,6 +244,54 @@ const validateData = (req, res, next) => {
 
   next();
 };
+
+
+app.post('/ad/new', async (req, res) => {
+  const { uniqueId, Account, ...newRecord } = req.body;
+
+  // Extract account email and product ID from uniqueId
+  const [accountEmail, productId] = uniqueId.split('-');
+
+  // Sanitize the table name
+  const tableName = accountEmail.replace(/[^a-zA-Z0-9_@.]/g, '_');
+  console.log(tableName); 
+
+  // Construct the SQL query
+  const query = `
+  INSERT INTO \`coutlet6@gmail.com\` (Product_id, \`Condition\`, Description, Images_FolderName, \`laptop Screen Size\`, Phone, PhoneBrand, PhoneBrandCarrier, Price, Size, \`Tablet Brand\`, Tags, Title, Type, Category)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
+
+
+  // Values for the SQL query
+  const values = [
+      newRecord['Product_id'],
+      newRecord['Condition'],
+      newRecord['Description'],
+      newRecord['Images_FolderName'],
+      newRecord['laptop Screen Size'],
+      newRecord['Phone'],
+      newRecord['PhoneBrand'],
+      newRecord['PhoneBrandCarrier'],
+      newRecord['Price'],
+      newRecord['Size'],
+      newRecord['Tablet Brand'],
+      newRecord['Tags'],
+      newRecord['Title'],
+      newRecord['Type'],
+      newRecord['Category']
+  ];
+
+  // Insert new record into the database
+  db.query(query, values, (error, results) => {
+      if (error) {
+          console.error('Database insert failed:', error);
+          return res.status(500).send('Failed to create record');
+      }
+      res.send('Record creation successful');
+  });
+});
+
 
 app.put("/ad/:uniqueId", validateData, (req, res) => {
   const uniqueId = req.params.uniqueId;
