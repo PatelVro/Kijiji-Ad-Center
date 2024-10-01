@@ -50,21 +50,21 @@
         tbody.innerHTML = '';
 
         const fieldSizes = {
-            'Condition': { width: 20, height: 2 },
-            'Description': { width: 100, height: 49 }, // Updated for textarea
-            'Images_FolderName': { width: 30, height: 2 },
-            'laptop Screen Size': { width: 20, height: 2 },
-            'Phone': { width: 15, height: 2 },
-            'PhoneBrand': { width: 25, height: 2 },
-            'PhoneBrandCarrier': { width: 25, height: 2 },
-            'Price': { width: 10, height: 2 },
-            'Product_id': { width: 10, height: 2 },
-            'Size': { width: 15, height: 2 },
-            'Tablet Brand': { width: 25, height: 2 },
-            'Tags': { width: 20, height: 2 },
-            'Title': { width: 100, height: 2 },
-            'Type': { width: 20, height: 2 },
-            'Category': { width: 100, height: 2 }
+            'Condition': { width: 165, height: 2 },
+            'Description': { width: 165, height: 49 }, // Updated for textarea
+            'Images_FolderName': { width: 165, height: 2 },
+            'laptop Screen Size': { width: 165, height: 2 },
+            'Phone': { width: 165, height: 2 },
+            'PhoneBrand': { width: 165, height: 2 },
+            'PhoneBrandCarrier': { width: 165, height: 2 },
+            'Price': { width: 165, height: 2 },
+            'Product_id': { width: 165, height: 2 },
+            'Size': { width: 165, height: 2 },
+            'Tablet Brand': { width: 165, height: 2 },
+            'Tags': { width: 165, height: 2 },
+            'Title': { width: 165, height: 2 },
+            'Type': { width: 165, height: 2 },
+            'Category': { width: 165, height: 2 }
         };
 
         for (const key in details) {
@@ -81,6 +81,7 @@
                 inputElement.value = details[key];
                 inputElement.style.resize = 'none'; // Disable resizing
                 // inputElement.readOnly = true;
+                inputElement.style.padding = '10px';
             } else {
                 // Create input element for other fields
                 inputElement = document.createElement('input');
@@ -90,6 +91,7 @@
                 inputElement.size = width; // Set width
                 inputElement.style.height = `${height}em`; // Set height
                 // inputElement.readOnly = true;
+                inputElement.style.padding = '10px';
             }
 
             if (isProductId) {
@@ -100,8 +102,9 @@
             const row = document.createElement('tr');
             const cellKey = document.createElement('td');
             const cellInput = document.createElement('td');
-            
+            cellKey.style.width = '0px';
             cellKey.textContent = key;
+            cellInput.style.width = "100%";
             cellInput.appendChild(inputElement);
 
             row.appendChild(cellKey);
@@ -220,12 +223,12 @@ fetchTableNames();
 
   <div id="app">
 
-    <nav id="navbar-main" class="navbar is-fixed-top">
+    <!-- <nav id="navbar-main" class="navbar is-fixed-top"> -->
       <!-- Navbar content -->
-    </nav>
+    <!-- </nav> -->
 
     
-      <aside class="aside is-placed-left is-expanded" style="width: 200px; flex-shrink: 0;">
+      <aside class="aside is-placed-left is-expanded">
       
         <div class="aside-tools">
           <div class="text-xl">
@@ -248,13 +251,13 @@ fetchTableNames();
           </ul>
    </aside>
 
-    <section class="is-title-bar">
+    <!-- <section class="is-title-bar">
       <h1 id="product-title"></h1>
-  </section>
+  </section> -->
 
-    <section class="is-hero-bar">
+    <!-- <section class="is-hero-bar"> -->
       <!-- Hero bar content -->
-    </section>
+    <!-- </section> -->
 
     <section class="section main-section">
       <div class="card has-table">
