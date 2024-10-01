@@ -189,6 +189,7 @@ function cancelChanges() {
     }
             const li = document.createElement('li');
             li.classList.add('--set-active-profile-html');
+            li.style.paddingLeft = "12px";
             li.innerHTML = `
                 <a href="#" data-table-name="${tableName}">
                     <span class="menu-item-label">${tableName}</span>
