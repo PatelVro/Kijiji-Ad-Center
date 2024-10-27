@@ -3,7 +3,7 @@ const mysql = require("mysql");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
-
+const dbConfig = require("./db_config");
 const app = express();
 const port = 3001;
 
@@ -21,11 +21,11 @@ app.use(express.static(path.join(__dirname, "dist")));
 
 // MySQL database connection
 const db = mysql.createConnection({
-  host: "127.0.0.1", // Replace with your MySQL host
-  port: "3306",
-  user: "tryout", // Replace with your MySQL username
-  password: "Superman1431$", // Replace with your MySQL password
-  database: "canadian_outlet_adcenter", // Replace with your database name
+  host: dbConfig.host,
+  port: dbConfig.port,
+  user: dbConfig.user,
+  password: dbConfig.password,
+  database: dbConfig.database
 });
 
 // Connect to MySQL
